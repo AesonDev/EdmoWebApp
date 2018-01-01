@@ -17,6 +17,25 @@
             "cwd": "${workspaceRoot}",
             "stopAtEntry": true,
             "externalConsole": false
-        }
+        },
+        {
+            "name": "apiGateway",
+            "type": "coreclr",
+            "request": "launch",
+            "cwd": "/app",     
+            "program": "/app/Edmo.ApiGateway.dll",
+            "sourceFileMap": {
+                "/app": "${workspaceRoot}/src/ApiGateway"
+            },       
+            "pipeTransport": {
+                "pipeProgram": "docker",
+                "pipeCwd": "${workspaceRoot}/src",
+                "pipeArgs": [
+                    "exec -i EdmoWeb.ApiGateway"
+                ],
+                "debuggerPath": "/vsdbg/vsdbg",
+                "quoteArgs": false
+            }
+        },
     ]
 }

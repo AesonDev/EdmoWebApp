@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <Product>EdmowEBaPP</Product>   
-    <FileVersion>0.1.0.0</FileVersion>
-    <Version>0.1.0</Version>  
-    <PackageVersion>00000</PackageVersion>  
+    <FileVersion>0.2.0.1</FileVersion>
+    <Version>0.2.0-unstable.1</Version>  
+    <PackageVersion>0.2.0-unstable0001</PackageVersion>  
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,6 +1,7 @@
 
 // Load external file and tools
 #tool "nuget:?package=GitVersion.CommandLine"
+#addin "Cake.Docker"
 
 //Read script parameter
 var target = Argument("target", "Default");
@@ -16,26 +17,17 @@ var nuGetApiKey = "8a4908df-3b3d-3511-9d2f-ccd543552a48";
 var csProjPathArray =  GetFiles("./**/*.csproj");
 //.csproj to version. The GitVersion will be set in the csproj
 var csProjToVersionPathArray =  GetFiles("./src/**/*.csproj");
+//csproj to debug
+var csProjToDebugPathArray =  GetFiles("./src/**/*.csproj");
 //csproj of tests
 var csProjToTestPathArray =  GetFiles("./tests/**/*.csproj");
-
-
-Setup(ctx =>
-    {
-    // Executed BEFORE the first task.
-    Information("Running tasks...");
-    });
-
-
-Teardown(ctx =>{
-        // Executed AFTER the last task.
-        Information("Finished running tasks.");
-    });
 
 Task("Default")
     .IsDependentOn("Build")
     .IsDependentOn("ExecuteTests")
     .IsDependentOn("VersionCsProj")
+    .IsDependentOn("PublishDotNet")
+    .IsDependentOn("DockerCompose-Debug")
     // .IsDependentOn("PackageNuget")
     // .IsDependentOn("PublishNuget")
     .Does(() =>{
@@ -151,4 +143,22 @@ Task("PublishNuget")
 
 
 
+Task("PublishDotNet")
+     .DoesForEach(csProjToDebugPathArray, (file) => {
+      DotNetCorePublish(file.FullPath, new DotNetCorePublishSettings {
+          Configuration = configuration,
+          ArgumentCustomization = args => args.Append("--no-restore ") 
+
+      });
+    });
+
+Task("DockerCompose-Debug")
+    .Does(() =>{
+    DockerComposeUp( new DockerComposeUpSettings {
+         ArgumentCustomization = args => args.Append("-d --build") ,
+         Files  = new string[]{"./Docker/Debug/docker-compose.yml"}
+         
+    });
+    
+    });
 RunTarget(target);
