@@ -12,8 +12,10 @@ tools/
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
+Docker/Debug/Published
+Docker/DEV/Published
 # Build results
-[Dd]ebug/
+
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/

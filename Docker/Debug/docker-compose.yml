@@ -1,0 +1,16 @@
+version: '3'
+services:
+  ApiGateway:
+    image: edmoweb.apigateway.dbg
+    container_name: EdmoWeb.ApiGateway.dbg
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '80:80'
+    volumes:
+      - ./Published/Edmo.ApiGateway/:/app
+    networks:
+      - EdmoWebApp-Debug
+networks:
+  EdmoWebApp-Debug: null

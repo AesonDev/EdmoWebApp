@@ -25,9 +25,9 @@ var csProjToTestPathArray =  GetFiles("./tests/**/*.csproj");
 Task("Default")
     .IsDependentOn("Build")
     .IsDependentOn("ExecuteTests")
-    .IsDependentOn("VersionCsProj")
-    .IsDependentOn("PublishDotNet")
-    .IsDependentOn("DockerCompose-Debug")
+    .IsDependentOn("VersionCsProj")    
+    .IsDependentOn("DockerCompose-DEBUG")
+    .IsDependentOn("DockerCompose-DEV")
     // .IsDependentOn("PackageNuget")
     // .IsDependentOn("PublishNuget")
     .Does(() =>{
@@ -143,22 +143,43 @@ Task("PublishNuget")
 
 
 
-Task("PublishDotNet")
+Task("PublishDotNet-DEBUG")
      .DoesForEach(csProjToDebugPathArray, (file) => {
-      DotNetCorePublish(file.FullPath, new DotNetCorePublishSettings {
-          Configuration = configuration,
-          ArgumentCustomization = args => args.Append("--no-restore ") 
+         var fileName = file.GetFilenameWithoutExtension();
+        DotNetCorePublish(file.FullPath, new DotNetCorePublishSettings {
+            Configuration = configuration,
+            ArgumentCustomization = args => args.Append("--no-restore "),
+            OutputDirectory = "./Docker/Debug/Published/" + fileName 
 
-      });
+        });
     });
 
-Task("DockerCompose-Debug")
+Task("PublishDotNet-DEV")    
+    .DoesForEach(csProjToDebugPathArray, (file) => {
+        var fileName = file.GetFilenameWithoutExtension();
+        DotNetCorePublish(file.FullPath, new DotNetCorePublishSettings {
+            Configuration = configuration,
+            ArgumentCustomization = args => args.Append("--no-restore ") ,
+            OutputDirectory = "./Docker/DEV/Published/" + fileName
+
+        });
+    });
+
+Task("DockerCompose-DEBUG")
+    .IsDependentOn("PublishDotNet-DEBUG")
     .Does(() =>{
-    DockerComposeUp( new DockerComposeUpSettings {
-         ArgumentCustomization = args => args.Append("-d --build") ,
-         Files  = new string[]{"./Docker/Debug/docker-compose.yml"}
-         
+        DockerComposeUp( new DockerComposeUpSettings {
+            ArgumentCustomization = args => args.Append("-d --build") ,
+            Files  = new string[]{"./Docker/Debug/docker-compose.yml"}            
+        });    
     });
-    
+
+Task("DockerCompose-DEV")
+    .IsDependentOn("PublishDotNet-DEV")
+    .Does(() =>{
+        DockerComposeUp( new DockerComposeUpSettings {
+            ArgumentCustomization = args => args.Append("-d --build") ,
+            Files  = new string[]{"./Docker/Dev/docker-compose.yml"}            
+        });    
     });
 RunTarget(target);
